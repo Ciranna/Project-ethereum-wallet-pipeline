@@ -1,6 +1,8 @@
 
 import { TEST_VECTOR } from "./config.js";
 
+import { deriveMasterKey } from "./primitives/hdWallet.js";
+
 import {
   mnemonicToSeed,
   bytesToHex
@@ -27,8 +29,20 @@ function initializeApplication() {
 
       const seedHex = bytesToHex(seed);
 
+      const master = await deriveMasterKey(seed);
+
+      const masterPrivateKeyHex = bytesToHex(
+      master.privateKey
+      );
+
+      const masterChainCodeHex = bytesToHex(
+      master.chainCode
+      );
+
       displayMessage(
-        `BIP-39 Seed (${seed.length} bytes): ${seedHex}`
+        `BIP-39 Seed (${seed.length} bytes): ${seedHex}\n` +
+        `Master Private Key: ${masterPrivateKeyHex}\n` +
+        `Master Chain Code: ${masterChainCodeHex}`
       );
     } catch (error) {
       console.error(error);

@@ -89,5 +89,6 @@ button:hover {
 }
 
 #results {
+  white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
