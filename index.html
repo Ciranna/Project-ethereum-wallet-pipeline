@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Ethereum Wallet Pipeline</title>
+
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+  <main class="container">
+
+    <header>
+      <h1>Ethereum Wallet Pipeline</h1>
+
+      <p>
+        From Mnemonic Phrase to Ethereum Address
+      </p>
+
+      <p class="subtitle">
+        An interactive educational exploration of
+        wallet standards and cryptographic primitives.
+      </p>
+    </header>
+
+    <section class="card">
+      <h2>1. Wallet Recovery Phrase</h2>
+
+      <p>
+        Explore how BIP-39 converts a mnemonic
+        phrase into a deterministic seed.
+      </p>
+
+      <label for="mnemonic">Mnemonic Phrase</label>
+
+      <textarea
+        id="mnemonic"
+        rows="3"
+        readonly
+      ></textarea>
+
+      <p class="warning">
+        Educational test vectors only.
+        Never enter a real wallet recovery phrase.
+      </p>
+
+      <button id="generate-seed">
+        Generate BIP-39 Seed
+      </button>
+    </section>
+
+    <section class="card">
+      <h2>2. Wallet Pipeline</h2>
+
+      <div id="pipeline">
+        <p>Mnemonic → BIP-39 → Seed</p>
+        <p>Seed → BIP-32 / BIP-44 → Private Key</p>
+        <p>Private Key → secp256k1 → Public Key</p>
+        <p>Public Key → Keccak-256 → Address</p>
+        <p>Address → EIP-55 → Checksummed Address</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>3. Results</h2>
+
+      <div id="results">
+        <p>Run the first pipeline step to see the result.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>4. Statistical Exploration</h2>
+
+      <p>
+        Statistical experiments will be added
+        after implementing the cryptographic pipeline.
+      </p>
+
+      <div id="statistics"></div>
+    </section>
+
+    <section class="card">
+      <h2>5. Scientific Conclusions</h2>
+
+      <div id="conclusions">
+        <p>
+          This application demonstrates the roles
+          of key derivation, elliptic-curve cryptography,
+          hashing, checksums and encoding.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
