@@ -2,6 +2,21 @@
 import { TEST_VECTOR, APP_CONFIG } from "./config.js";
 
 import {
+  displayExperimentalInterpretation
+} from "./analysis/conclusions.js";
+
+import {
+  runAvalancheExperiment,
+  runAvalancheAnalysis
+} from "./analysis/avalanche.js";
+
+import {
+  displaySingleAvalanche,
+  displayFullAvalanche
+} from "./analysis/statisticsUI.js";
+
+
+import {
   mnemonicToSeed,
   bytesToHex
 } from "./primitives/bip39.js";
@@ -245,4 +260,169 @@ function initializeApplication() {
     .addEventListener("click", resetPipeline);
 }
 
+
+
+function initializeStatisticalExploration() {
+  const inputElement = document.getElementById(
+    "avalanche-input"
+  );
+
+  const bitIndexElement = document.getElementById(
+    "avalanche-bit-index"
+  );
+
+  const errorElement = document.getElementById(
+    "statistics-error"
+  );
+
+  const singleButton = document.getElementById(
+    "run-single-avalanche"
+  );
+
+  const fullButton = document.getElementById(
+    "run-full-avalanche"
+  );
+
+  const resetButton = document.getElementById(
+    "reset-statistics"
+  );
+
+  const resultsElement = document.getElementById(
+    "statistics-results"
+  );
+
+  const chartElement = document.getElementById(
+    "statistics-chart"
+  );
+
+  const interpretationElement = document.getElementById(
+    "experimental-interpretation"
+  );
+
+  const initialInput = inputElement.value;
+  const initialBitIndex = bitIndexElement.value;
+
+  let experimentState = "idle";
+
+  function updateControls() {
+    const isIdle = experimentState === "idle";
+    const isCompleted = experimentState === "completed";
+
+    inputElement.disabled = !isIdle;
+    bitIndexElement.disabled = !isIdle;
+
+    singleButton.disabled = !isIdle;
+    fullButton.disabled = !isIdle;
+
+    resetButton.disabled = !isCompleted;
+  }
+
+  function setExperimentState(newState) {
+    experimentState = newState;
+    updateControls();
+  }
+
+  function clearResults() {
+    resultsElement.replaceChildren();
+    chartElement.replaceChildren();
+    interpretationElement.replaceChildren();
+    interpretationElement.hidden = true;
+    errorElement.textContent = "";
+  }
+
+  function readInput() {
+    const text = inputElement.value;
+
+    if (text.length === 0) {
+      throw new Error("Please enter some text.");
+    }
+
+    const bytes = new TextEncoder().encode(text);
+
+    if (bytes.length > 64) {
+      throw new Error(
+        "Maximum input length is 64 UTF-8 bytes."
+      );
+    }
+
+    bitIndexElement.max = String(bytes.length * 8 - 1);
+
+    return bytes;
+  }
+
+  singleButton.addEventListener("click", () => {
+    if (experimentState !== "idle") return;
+
+    try {
+      clearResults();
+
+      const bytes = readInput();
+      const bitIndex = Number(bitIndexElement.value);
+
+      // Validazione e calcolo prima di bloccare
+      // definitivamente l'interfaccia.
+      const result = runAvalancheExperiment(
+        bytes,
+        bitIndex
+      );
+
+      setExperimentState("running");
+
+      displaySingleAvalanche(result);
+
+      setExperimentState("completed");
+
+    } catch (error) {
+      clearResults();
+      errorElement.textContent = error.message;
+      setExperimentState("idle");
+    }
+  });
+
+  fullButton.addEventListener("click", () => {
+    if (experimentState !== "idle") return;
+
+    try {
+      clearResults();
+
+      const bytes = readInput();
+
+      setExperimentState("running");
+
+      const analysis = runAvalancheAnalysis(bytes);
+
+      displayFullAvalanche(analysis);
+      displayExperimentalInterpretation(analysis);
+
+      interpretationElement.hidden = false;
+
+      setExperimentState("completed");
+
+    } catch (error) {
+      clearResults();
+      errorElement.textContent = error.message;
+      setExperimentState("idle");
+    }
+  });
+
+  resetButton.addEventListener("click", () => {
+    if (experimentState !== "completed") return;
+
+    clearResults();
+
+    inputElement.value = initialInput;
+    bitIndexElement.value = initialBitIndex;
+    bitIndexElement.max = String(
+      new TextEncoder().encode(initialInput).length * 8 - 1
+    );
+
+    setExperimentState("idle");
+  });
+
+  updateControls();
+}
+
+
 initializeApplication();
+initializeStatisticalExploration();
+

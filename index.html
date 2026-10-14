@@ -14,6 +14,14 @@
 <body>
   <main class="container">
 
+
+    <nav class="main-navigation" aria-label="Main navigation">
+    <a href="#wallet-pipeline">Wallet Pipeline</a>
+    <a href="#statistical-exploration">Statistical Exploration</a>
+    <a href="#scientific-conclusions">Scientific Conclusions</a>
+    </nav>
+
+
     <header>
       <h1>Ethereum Wallet Pipeline</h1>
 
@@ -27,8 +35,8 @@
       </p>
     </header>
 
-    <section class="card">
-      <h2>1. Interactive Wallet Pipeline</h2>
+    <section class="card" id="wallet-pipeline">
+      <h2>1. Interactive Wallet Pipeline</h2>   
 
       <p>
         Execute each cryptographic stage in sequence
@@ -281,27 +289,108 @@
       <p id="pipeline-error" role="alert"></p>
     </section>
 
-    <section class="card">
-      <h2>2. Statistical Exploration</h2>
+    
+    <section class="card" id="statistical-exploration">
+    <h2>2. Statistical Exploration</h2>
 
-      <p>
-        Explore the avalanche effect of Keccak-256
-        through controlled bit modifications.
-      </p>
+    <p>
+        Investigate the avalanche effect of Keccak-256
+        by modifying individual input bits.
+    </p>
 
-      <div id="statistics"></div>
+    <div class="statistics-panel">
+
+        <label for="avalanche-input">Input text</label>
+
+        <input
+        id="avalanche-input"
+        type="text"
+        value="Ethereum"
+        maxlength="64"
+        autocomplete="off"
+        spellcheck="false"
+        >
+
+        <p class="statistics-hint">
+        The input is encoded as UTF-8.
+        Maximum length: 64 characters.
+        </p>
+
+        <div class="bit-selector">
+        <label for="avalanche-bit-index">
+            Bit index
+        </label>
+
+        <input
+            id="avalanche-bit-index"
+            type="number"
+            min="0"
+            value="0"
+        >
+        </div>
+
+        <div class="statistics-actions">
+        <button id="run-single-avalanche">
+            Test Single Bit
+        </button>
+
+        <button id="run-full-avalanche">
+            Analyze All Bits
+        </button>
+
+        <button id="reset-statistics" type="button" disabled>
+            Reset
+        </button>
+        </div>
+
+        <p id="statistics-error" role="alert"></p>
+
+        <div id="statistics-results" aria-live="polite"></div>
+
+        <div id="experimental-interpretation" hidden></div>
+
+        <div id="statistics-chart"></div>
+
+    </div>
     </section>
 
-    <section class="card">
+
+    <section class="card" id="scientific-conclusions">
       <h2>3. Scientific Conclusions</h2>
 
+        
       <div id="conclusions">
+        <h3>Understanding the Avalanche Effect</h3>
+
         <p>
-          This application demonstrates key derivation,
-          elliptic-curve cryptography, hashing,
-          checksums and encoding.
+            The avalanche effect describes the sensitivity of
+            a cryptographic function to changes in its input.
+            Ideally, changing a single input bit should cause
+            approximately half of the output bits to change.
+        </p>
+
+        <p>
+            For a 256-bit hash, the theoretical expected
+            Hamming distance is 128 bits.
+        </p>
+
+        <h3>Scientific Limitations</h3>
+
+        <p>
+            An avalanche experiment measures one statistical
+            property of a hash function. Results close to 50%
+            are consistent with the expected behavior of an
+            ideal cryptographic hash.
+        </p>
+
+        <p>
+            However, these observations alone cannot establish
+            collision resistance, preimage resistance,
+            second-preimage resistance, or overall
+            cryptographic security.
         </p>
       </div>
+
     </section>
 
   </main>
