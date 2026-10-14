@@ -1,4 +1,6 @@
 
+import { HDKey } from "@scure/bip32";
+
 const encoder = new TextEncoder();
 
 const SECP256K1_ORDER = BigInt(
@@ -60,5 +62,33 @@ export async function deriveMasterKey(seed) {
   return {
     privateKey,
     chainCode
+  };
+}
+
+
+export function deriveEthereumKey(seed, path) {
+  if (!(seed instanceof Uint8Array)) {
+    throw new TypeError("Seed must be a Uint8Array");
+  }
+
+  if (seed.length < 16 || seed.length > 64) {
+    throw new RangeError(
+      "BIP-32 seed must contain 16 to 64 bytes"
+    );
+  }
+
+  const master = HDKey.fromMasterSeed(seed);
+
+  const derived = master.derive(path);
+
+  if (!derived.privateKey || !derived.chainCode) {
+    throw new Error("Unable to derive private key");
+  }
+
+  return {
+    path,
+    privateKey: derived.privateKey,
+    chainCode: derived.chainCode,
+    publicKey: derived.publicKey
   };
 }
