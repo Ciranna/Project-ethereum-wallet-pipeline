@@ -17,81 +17,289 @@
     <header>
       <h1>Ethereum Wallet Pipeline</h1>
 
-      <p>
+      <p class="subtitle">
         From Mnemonic Phrase to Ethereum Address
       </p>
 
-      <p class="subtitle">
+      <p>
         An interactive educational exploration of
         wallet standards and cryptographic primitives.
       </p>
     </header>
 
     <section class="card">
-      <h2>1. Wallet Recovery Phrase</h2>
+      <h2>1. Interactive Wallet Pipeline</h2>
 
       <p>
-        Explore how BIP-39 converts a mnemonic
-        phrase into a deterministic seed.
+        Execute each cryptographic stage in sequence
+        and explore its intermediate results.
       </p>
 
-      <label for="mnemonic">Mnemonic Phrase</label>
+      <div class="progress-container">
+        <div class="progress-info">
+          <span>Pipeline progress</span>
+          <span id="progress-label">0 / 5 completed</span>
+        </div>
 
-      <textarea
-        id="mnemonic"
-        rows="3"
-        readonly
-      ></textarea>
-
-      <p class="warning">
-        Educational test vectors only.
-        Never enter a real wallet recovery phrase.
-      </p>
-
-      <button id="generate-seed">
-        Generate BIP-39 Seed
-      </button>
-    </section>
-
-    <section class="card">
-      <h2>2. Wallet Pipeline</h2>
-
-      <div id="pipeline">
-        <p>Mnemonic → BIP-39 → Seed</p>
-        <p>Seed → BIP-32 / BIP-44 → Private Key</p>
-        <p>Private Key → secp256k1 → Public Key</p>
-        <p>Public Key → Keccak-256 → Address</p>
-        <p>Address → EIP-55 → Checksummed Address</p>
+        <div class="progress-track">
+          <div id="progress-bar"></div>
+        </div>
       </div>
-    </section>
 
-    <section class="card">
-      <h2>3. Results</h2>
+      <div id="wallet-steps">
 
-      <div id="results">
-        <p>Run the first pipeline step to see the result.</p>
+        <article class="wallet-step" id="step-1">
+          <div class="step-heading">
+            <div>
+              <h3>Step 1 — BIP-39</h3>
+              <p>Mnemonic → Seed</p>
+            </div>
+            <span class="step-status">Ready</span>
+          </div>
+
+
+          <details class="step-explanation">
+            <summary>How does BIP-39 work?</summary>
+
+            <p>
+                BIP-39 derives a 512-bit seed from a mnemonic
+                phrase and an optional passphrase.
+            </p>
+
+            <p>
+                It uses PBKDF2 with HMAC-SHA512,
+                2048 iterations and Unicode NFKD normalization.
+            </p>
+
+            <code>
+                Seed = PBKDF2-HMAC-SHA512(
+                mnemonic, "mnemonic" + passphrase
+                )
+            </code>
+
+            <p>
+                The resulting seed is 64 bytes long.
+            </p>
+          </details>
+
+
+          <label for="mnemonic">Mnemonic Phrase</label>
+
+          <textarea
+            id="mnemonic"
+            rows="3"
+            readonly
+          ></textarea>
+
+          <p class="warning">
+            Educational test vectors only.
+            Never enter a real wallet recovery phrase.
+          </p>
+
+          <button id="run-step-1">
+            Generate BIP-39 Seed
+          </button>
+
+          <div class="step-results" id="results-step-1"></div>
+        </article>
+
+        <article class="wallet-step locked" id="step-2">
+          <div class="step-heading">
+            <div>
+              <h3>Step 2 — BIP-32 / BIP-44</h3>
+              <p>Seed → Private Key</p>
+            </div>
+            <span class="step-status">Locked</span>
+          </div>
+
+
+          <details class="step-explanation">
+            <summary>How does hierarchical derivation work?</summary>
+
+            <p>
+                BIP-32 derives a master private key and chain code
+                from the seed using HMAC-SHA512.
+            </p>
+
+            <code>
+                I = HMAC-SHA512("Bitcoin seed", seed)
+            </code>
+
+            <p>
+                The left 32 bytes form the master private key,
+                while the right 32 bytes form the chain code.
+            </p>
+
+            <p>
+                BIP-44 defines the hierarchical derivation path
+                used to select the Ethereum account key.
+            </p>
+
+            <code>m/44'/60'/0'/0/0</code>
+          </details>
+
+
+          <button id="run-step-2" disabled>
+            Derive Private Key
+          </button>
+
+          <div class="step-results" id="results-step-2"></div>
+        </article>
+
+        <article class="wallet-step locked" id="step-3">
+          <div class="step-heading">
+            <div>
+              <h3>Step 3 — secp256k1</h3>
+              <p>Private Key → Public Key</p>
+            </div>
+            <span class="step-status">Locked</span>
+          </div>
+
+
+          <details class="step-explanation">
+            <summary>How does elliptic-curve cryptography work?</summary>
+
+            <p>
+                The public key is generated by elliptic-curve
+                scalar multiplication.
+            </p>
+
+            <code>Q = k × G</code>
+
+            <p>
+                k is the private key, G is the generator point,
+                and Q is the resulting public key.
+            </p>
+
+            <p>
+                Ethereum uses the secp256k1 elliptic curve.
+                Recovering k from Q is computationally infeasible
+                with currently known classical algorithms
+                at the security level of this curve.
+            </p>
+          </details>
+
+
+          <button id="run-step-3" disabled>
+            Generate Public Key
+          </button>
+
+          <div class="step-results" id="results-step-3"></div>
+        </article>
+
+        <article class="wallet-step locked" id="step-4">
+          <div class="step-heading">
+            <div>
+              <h3>Step 4 — Keccak-256</h3>
+              <p>Public Key → Ethereum Address</p>
+            </div>
+            <span class="step-status">Locked</span>
+          </div>
+
+
+          <details class="step-explanation">
+            <summary>How is an Ethereum address generated?</summary>
+
+            <p>
+                Ethereum hashes the 64-byte public key
+                using Keccak-256.
+            </p>
+
+            <code>Hash = Keccak256(PublicKey)</code>
+
+            <p>
+                The Ethereum address is obtained by taking
+                the last 20 bytes of the 32-byte hash.
+            </p>
+
+            <code>Address = Hash[12..31]</code>
+
+            <p>
+                Keccak-256 is distinct from the standardized
+                SHA3-256 function.
+            </p>
+          </details>
+
+
+          <button id="run-step-4" disabled>
+            Generate Ethereum Address
+          </button>
+
+          <div class="step-results" id="results-step-4"></div>
+        </article>
+
+        <article class="wallet-step locked" id="step-5">
+          <div class="step-heading">
+            <div>
+              <h3>Step 5 — EIP-55</h3>
+              <p>Ethereum Address → Checksum</p>
+            </div>
+            <span class="step-status">Locked</span>
+          </div>
+
+
+          <details class="step-explanation">
+            <summary>How does the EIP-55 checksum work?</summary>
+
+            <p>
+                EIP-55 introduces mixed-case hexadecimal
+                encoding to help detect typing errors.
+            </p>
+
+            <p>
+                A Keccak-256 hash of the lowercase hexadecimal
+                address text determines which letters
+                are capitalized.
+            </p>
+
+            <p>
+                The checksum does not change the underlying
+                20-byte Ethereum address.
+            </p>
+          </details>
+
+
+          <button id="run-step-5" disabled>
+            Apply Address Checksum
+          </button>
+
+          <div class="step-results" id="results-step-5"></div>
+        </article>
+
       </div>
+
+      <div class="pipeline-actions">
+        <button id="run-all">
+          Run All Steps
+        </button>
+
+        <button id="reset-pipeline" class="secondary-button">
+          Reset Pipeline
+        </button>
+      </div>
+
+      <p id="pipeline-error" role="alert"></p>
     </section>
 
     <section class="card">
-      <h2>4. Statistical Exploration</h2>
+      <h2>2. Statistical Exploration</h2>
 
       <p>
-        Statistical experiments will be added
-        after implementing the cryptographic pipeline.
+        Explore the avalanche effect of Keccak-256
+        through controlled bit modifications.
       </p>
 
       <div id="statistics"></div>
     </section>
 
     <section class="card">
-      <h2>5. Scientific Conclusions</h2>
+      <h2>3. Scientific Conclusions</h2>
 
       <div id="conclusions">
         <p>
-          This application demonstrates the roles
-          of key derivation, elliptic-curve cryptography,
-          hashing, checksums and encoding.
+          This application demonstrates key derivation,
+          elliptic-curve cryptography, hashing,
+          checksums and encoding.
         </p>
       </div>
     </section>
